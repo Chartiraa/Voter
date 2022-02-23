@@ -1,5 +1,24 @@
-require('dotenv').config()
-const tmi = require('tmi.js');
+import { initializeApp } from 'firebase/app';
+import { getDatabase, ref, set, update } from "firebase/database";
+import 'dotenv/config';
+import tmi from 'tmi.js';
+
+// TODO: Replace with your app's Firebase project configuration
+const firebaseConfig = {
+	apiKey: "AIzaSyAqNC-8LxXz5ouobcXKLE-exRbyP5oaum0",
+	authDomain: "voter-7195f.firebaseapp.com",
+	databaseURL: "https://voter-7195f-default-rtdb.europe-west1.firebasedatabase.app",
+	projectId: "voter-7195f",
+	storageBucket: "voter-7195f.appspot.com",
+	messagingSenderId: "79931227348",
+	appId: "1:79931227348:web:2c131b480c41f9ad5c8f41",
+	measurementId: "G-TM5HESHXRH"
+  };
+
+const app = initializeApp(firebaseConfig);
+
+// Get a reference to the database service
+const database = getDatabase(app);
 
 const client = new tmi.Client({
 	options: { debug: true },
@@ -15,6 +34,10 @@ var second = 0;
 var userList = [];
 
 client.connect();
+openRecord(first,second);
+var myInt = setInterval(function () {
+    updateRecord(first, second);
+}, 500);
 
 client.on('message', (channel, tags, message, self) => {
 	// Ignore echoed messages.
@@ -67,3 +90,25 @@ let countVote = (message, channel) =>{
 		client.say(channel, `Amerigalı Şerif Samuel`);
 	}
 }
+function openRecord(first, second) {
+	const db = getDatabase();
+	set(ref(db, 'Vote/Hype'), {
+	  First: first,
+	  Second: second,
+	});
+  }
+function updateRecord(first, second) {
+	const db = getDatabase();
+  
+	// A post entry.
+	const postData = {
+	  First: first,
+	  Second: second
+	};
+    
+	// Write the new post's data simultaneously in the posts list and the user's post list.
+	const updates = {};
+	updates['Vote/Hype'] = postData;
+  
+	return update(ref(db), updates);
+  }

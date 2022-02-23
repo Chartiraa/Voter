@@ -11,8 +11,68 @@
         <input type="range" min="1" max="1000" value="500" class="slider" id="voter">
       </div>
       <p><span id="value"></span></p>
+      <p><span id="first"></span></p>
+      <p><span id="second"></span></p>
+
 <script src="scripts/index.js"></script>
 
+<script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-analytics.js";
+    // TODO: Add SDKs for Firebase products that you want to use
+    // https://firebase.google.com/docs/web/setup#available-libraries
+  
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+      apiKey: "AIzaSyAqNC-8LxXz5ouobcXKLE-exRbyP5oaum0",
+      authDomain: "voter-7195f.firebaseapp.com",
+      databaseURL: "https://voter-7195f-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "voter-7195f",
+      storageBucket: "voter-7195f.appspot.com",
+      messagingSenderId: "79931227348",
+      appId: "1:79931227348:web:2c131b480c41f9ad5c8f41",
+      measurementId: "G-TM5HESHXRH"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+
+    import {getDatabase, ref, get, child}
+    from "https://www.gstatic.com/firebasejs/9.6.7/firebase-database.js";
+    
+    const db = getDatabase();
+
+
+    const slider = document.getElementById("voter");
+    var first,second,sum = 0;
+    
+
+    const dbref = ref(db);
+
+    var timer = window.setInterval(function(){
+        get(child(dbref,"Vote/Hype")).then((snapshot)=>{
+            if (snapshot.exists()){
+                first = snapshot.val().First;
+                second = snapshot.val().Second;
+                sum = first + second;
+
+                console.log((1000*first)/sum);
+
+                slider.value = (1000*first)/sum;
+            }
+            else{
+                alert("Nerde lan bunlar");
+            }
+        })
+        .catch((error)=>{
+            alert("bişeyi yapamadım ama ne"+error);
+        });
+    }, 500);
+
+  </script>
 </body>
 
 </html>
